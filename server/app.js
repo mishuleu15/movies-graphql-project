@@ -8,7 +8,7 @@ require('dotenv').config();
 const colors = require('colors');
 
 const app = express();
-const PORT = 3000;
+const PORT = 5000;
 
 mongoose.connect(process.env.CONNECTION_URL);
 mongoose.connection.once('open', () => {
@@ -17,7 +17,19 @@ mongoose.connection.once('open', () => {
   );
 });
 
-app.use(cors());
+const whitelist = ['http://localhost:3000'];
+
+const corsOptions = {
+  origin: (origin, callback) => {
+    if (whitelist.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+};
+
+app.use(cors(corsOptions));
 
 app.use(
   '/graphql',
